@@ -9,8 +9,12 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.dicoding.courseschedule.R
 import com.dicoding.courseschedule.data.Course
+import com.dicoding.courseschedule.data.DataRepository
+import com.dicoding.courseschedule.ui.add.AddActivity
+import com.dicoding.courseschedule.ui.list.ListActivity
 import com.dicoding.courseschedule.ui.setting.SettingsActivity
 import com.dicoding.courseschedule.util.DayName
+import com.dicoding.courseschedule.util.FunctionLibrary
 import com.dicoding.courseschedule.util.QueryType
 import com.dicoding.courseschedule.util.timeDifference
 
@@ -26,6 +30,18 @@ class HomeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_home)
         supportActionBar?.title = resources.getString(R.string.today_schedule)
 
+        // get data from repository
+        val repository : DataRepository? = DataRepository.getInstance(applicationContext)
+        if (repository != null){
+            viewModel = HomeViewModel(repository)
+            val course = repository.getNearestSchedule(queryType)
+            course.observe(this, {
+                showTodaySchedule(course = it)
+            })
+        }
+        else{
+            FunctionLibrary.showToast(applicationContext, "Fetching data encountered error")
+        }
     }
 
     private fun showTodaySchedule(course: Course?) {
@@ -33,10 +49,15 @@ class HomeActivity : AppCompatActivity() {
         course?.apply {
             val dayName = DayName.getByNumber(day)
             val time = String.format(getString(R.string.time_format), dayName, startTime, endTime)
-            val remainingTime = timeDifference(day, startTime)
+            val remainingTime = timeDifference(day + 1, startTime)
 
             val cardHome = findViewById<CardHomeView>(R.id.view_home)
-
+            // bind data
+            cardHome.setCourseName(course.courseName)
+            cardHome.setTime(time)
+            cardHome.setRemainingTime("($remainingTime)")
+            cardHome.setLecturer(course.lecturer)
+            cardHome.setNote(course.note)
         }
 
         findViewById<TextView>(R.id.tv_empty_home).visibility =
@@ -62,8 +83,9 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val intent: Intent = when (item.itemId) {
-
+            R.id.action_list -> Intent(this, ListActivity::class.java)
             R.id.action_settings -> Intent(this, SettingsActivity::class.java)
+            R.id.action_add -> Intent(this, AddActivity::class.java)
             else -> null
         } ?: return super.onOptionsItemSelected(item)
 

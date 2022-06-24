@@ -1,8 +1,11 @@
 package com.dicoding.courseschedule.paging
 
+import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
+import com.dicoding.courseschedule.R
 import com.dicoding.courseschedule.data.Course
 
 //TODO 6 : Implement Method for PagedListAdapter
