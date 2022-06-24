@@ -31,6 +31,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
     buildFeatures{
         viewBinding true
     }
@@ -64,7 +65,7 @@ dependencies {
     implementation "com.google.android.material:material:$material_version"
     implementation "androidx.preference:preference-ktx:$preference_version"
     implementation "androidx.room:room-runtime:$room_version"
-    
+
     kapt "androidx.room:room-compiler:$room_version"
 
     implementation "androidx.paging:paging-runtime-ktx:$paging_version"
